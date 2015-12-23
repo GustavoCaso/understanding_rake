@@ -1,0 +1,17 @@
+require 'rake'
+
+SOURCE_FILES = Rake::FileList.new("sources/**/*.md", "sources/**/*.markdown")
+
+task :default => :html
+
+task :html => SOURCE_FILES.pathmap("%{^sources/,outputs/}X.html")
+
+rule ".html" => ->(f){source_for_html(f)} do |t|
+  sh "pandoc -o #{t.name} #{t.source}"
+end
+
+def source_for_html(html_file)
+  SOURCE_FILES.detect do |f|
+    f.pathmap('%n') == html_file.pathmap('%n')
+  end
+end
